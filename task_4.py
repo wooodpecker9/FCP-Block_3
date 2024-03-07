@@ -3,9 +3,47 @@
 import matplotlib.pyplot as plt
 from scipy.integrate import odeint
 import numpy as np
+import argparse
 
 
 # Function definitions
+def parse_command_line_arguments_with_argpparse():
+
+    parser = argparse.ArgumentParser(description='Input data')
+    parser.add_argument('-i', '--initial', type=int, metavar='N', nargs='+', required=True, help='Sets the initial values for both species')
+    parser.add_argument('-a', '--alpha', type=int, metavar='N', nargs='+', required=True, help='Alpha values (Max of 5)')
+    parser.add_argument('-b', '--beta', type=int, metavar='', required=True, help='Beta value (Only 1)')
+    parser.add_argument('-d', '--delta', type=int, metavar='', required=True, help='Delta value (Only 1)')
+    parser.add_argument('-g', '--gamma', type=int, metavar='', required=True, help='Gamma value (Only 1)')
+    parser.add_argument('-s', '--save_plot', type=str, metavar='', help='Saves plot with provided file name')
+
+    args = parser.parse_args()
+
+    initial_values = args.initial
+    if len(initial_values) > 2:
+        print("Error: Too many initial inputs (Max of 2)")
+        exit()
+    
+    alpha_values = args.alpha
+    if len(alpha_values) > 5:
+        print("Error: Too many alpha inputs (Max of 5)")
+        exit()
+    
+    beta_value = args.beta
+
+    delta_value = args.delta
+
+    gamma_value = args.gamma
+
+    if args.save_plot:
+        save_plot = True
+        save_plot_name = args.save_plot
+    else:
+        save_plot = False
+        save_plot_name = ''
+    
+    return (initial_values, alpha_values, beta_value, delta_value, gamma_value, save_plot, save_plot_name)
+
 def diff_lotka_volterra(lotka, t, alpha, beta, delta, gamma):
     '''
     alpha = birth rate of the prey
@@ -15,7 +53,7 @@ def diff_lotka_volterra(lotka, t, alpha, beta, delta, gamma):
     '''
 
     dxdt = (alpha * lotka[0]) - (beta * lotka[0] * lotka[1])
-    dydt = (delta * lotka[0] * lotka[1]) - (gamma * lotka[1])
+    dydt = (delta * lotka[0] * lotka[1]) - (gamma* lotka[1])
 
     grad = [dxdt, dydt]
 
