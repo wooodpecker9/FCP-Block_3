@@ -81,16 +81,13 @@ def plot_lotka(t, data, alpha):
     ax2 = fig.add_subplot(312)
     ax2.plot(t, data[:, 1], label='y(t)')
 
-    ax1.set_title(f'Lotka-Volterra Simulation (Alpha={alpha})')
+    ax1.set_title(f'Lotka-Volterra equations, alpha={alpha}')
     ax1.set_xlabel('Time')
-    ax1.set_ylabel('Prey Population Density')
-
+    ax1.set_ylabel('Prey population')
     ax2.set_xlabel('Time')
-    ax2.set_ylabel('Predator Population Density')
+    ax2.set_ylabel('Predator population')
 
-    save_filename = f'lotka_volterra_alpha={alpha}.png'
-    plt.savefig(save_filename)
-    print(f'Figure is saved as {save_filename}')
+
 
 
 # Main function
@@ -98,21 +95,16 @@ def main():
     '''
     allow a user to set the value of alpha, beta, delta and gamma
     '''
-    n = int(input('Enter how many values of alpha(up to 5): '))
-    while n > 5:
-        n = int(input('Please enter a value less than or equal to 5:'))
-    all_alpha = []
-    for i in range(0,n):
-        alpha = int(input('Enter alpha: '))
-        all_alpha.append(alpha)
-    beta = int(input('Enter beta: '))
-    delta = int(input('Enter delta: '))
-    gamma = int(input('Enter gamma: '))
-    for alpha in all_alpha:
-        diff_lotka_volterra([1, 1], 10, alpha, beta, delta, gamma)
-        data, t = solve_lotka_volterra([1, 1], 10, alpha, beta, delta, gamma)
-        plot_lotka(t, data, alpha)
+    initial_values, alpha_values, beta_value, delta_value, gamma_value, save_plot, save_plot_name = parse_command_line_arguments_with_argpparse()
 
+    for alpha in alpha_values:
+        diff_lotka_volterra(initial_values, 10, alpha, beta_value, delta_value, gamma_value)
+        data, t = solve_lotka_volterra(initial_values, 10, alpha, beta_value, delta_value, gamma_value)
+        plot_lotka(t, data, alpha)
+        if save_plot == True:
+            plt.savefig(save_plot_name)
+        else:
+            plt.show()
     return
 
 if __name__ == "__main__":
