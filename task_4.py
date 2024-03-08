@@ -15,7 +15,7 @@ def parse_command_line_arguments_with_argpparse():
     parser.add_argument('-b', '--beta', type=int, metavar='', required=True, help='Beta value (Only 1)')
     parser.add_argument('-d', '--delta', type=int, metavar='', required=True, help='Delta value (Only 1)')
     parser.add_argument('-g', '--gamma', type=int, metavar='', required=True, help='Gamma value (Only 1)')
-    parser.add_argument('-s', '--save_plot', type=str, metavar='', help='Saves plot with provided file name')
+    parser.add_argument('-s', '--save_plot', type=str, metavar='', help='Saves plot with provided file name (Needs either a .png, .pdf, .svg, ect at the end)')
 
     args = parser.parse_args()
 
@@ -71,23 +71,35 @@ def solve_lotka_volterra(lotka0, t_max, alpha, beta, delta, gamma):
 
     return lotka, t
 
-def plot_lotka(t, data, alpha):
+def plot_lotka_volterra(lotka0, t_max, alpha, beta, delta, gamma):
     '''
     plot the simulation results of the Lotka-Volterra equation and save it
     '''
-    fig = plt.figure()
+    plots = len(alpha)
+
+    figure, axis = plt.subplots(plots, 1)
+
+    for n in range(plots):
+        diff_lotka_volterra(lotka0, t_max, alpha[n], beta, delta, gamma)
+        data, t = solve_lotka_volterra(lotka0, t_max, alpha[n], beta, delta, gamma)
+        axis[n].plot(t, data[:, 0], color='b', label='Prey (x(t))')
+        axis[n].plot(t, data[:, 1], color='r', label='Predator (y(t))')
+        axis[n].set_xlabel('Time')
+        axis[n].set_ylabel('Population')
+        axis[n].set_title(f'Lotka-Volterra equations, alpha={alpha[n]}')
+        axis[n].legend()
+
+    '''fig = plt.figure()
     ax1 = fig.add_subplot(311)
     ax1.plot(t, data[:, 0], label='x(t)')
     ax2 = fig.add_subplot(312)
     ax2.plot(t, data[:, 1], label='y(t)')
 
-    ax1.set_title(f'Lotka-Volterra equations, alpha={alpha}')
+    ax1.set_title()
     ax1.set_xlabel('Time')
     ax1.set_ylabel('Prey population')
     ax2.set_xlabel('Time')
-    ax2.set_ylabel('Predator population')
-
-
+    ax2.set_ylabel('Predator population')'''
 
 
 # Main function
@@ -96,15 +108,14 @@ def main():
     allow a user to set the value of alpha, beta, delta and gamma
     '''
     initial_values, alpha_values, beta_value, delta_value, gamma_value, save_plot, save_plot_name = parse_command_line_arguments_with_argpparse()
+    t = 100
 
-    for alpha in alpha_values:
-        diff_lotka_volterra(initial_values, 10, alpha, beta_value, delta_value, gamma_value)
-        data, t = solve_lotka_volterra(initial_values, 10, alpha, beta_value, delta_value, gamma_value)
-        plot_lotka(t, data, alpha)
-        if save_plot == True:
-            plt.savefig(save_plot_name)
-        else:
-            plt.show()
+    plot_lotka_volterra(initial_values, t, alpha_values, beta_value, delta_value, gamma_value)
+    
+    if save_plot == True:
+        plt.savefig(save_plot_name) 
+    else:
+        plt.show()
     return
 
 if __name__ == "__main__":
